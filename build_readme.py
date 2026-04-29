@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 # This Python script finds recursively all
 # Processing and SuperCollider programs
@@ -7,14 +7,14 @@
 # resulting list to the file "readme.md",
 # which GitHub uses as a read me file.
 
-import os, os.path, subprocess, re, cgi
+import os, os.path, subprocess, re, html
 
 columns = 5
 
 execstr = "git ls-files processing/ideas/ | grep -E '.pde|.scd'"
-result = subprocess.check_output(execstr, shell=True).split('\n')
+result = subprocess.check_output(execstr, shell=True).decode().split('\n')
 
-absolutePath = 'https://github.com/hamoid/Fun-Programming/blob/master'
+absolutePath = 'https://codeberg.org/hamoid/Fun-Programming/src/branch/master'
 
 f = open('readme.md', "w")
 
@@ -24,16 +24,17 @@ f.write('''
 In this repository you can find:
 
 - Programs written for the [Fun Programming](https://funprogramming.org) video
-  tutorials: [fun-programming](https://github.com/hamoid/Fun-Programming/tree/master/processing/fun-programming)
-- My creative coding experiments: [processing/ideas](https://github.com/hamoid/Fun-Programming/tree/master/processing/ideas).
+  tutorials: [fun-programming](https://codeberg.org/hamoid/Fun-Programming/src/branch/master/processing/fun-programming)
+- My creative coding experiments:
+  [processing/ideas](https://codeberg.org/hamoid/Fun-Programming/src/branch/master/processing/ideas).
   These are not finished work but tests I do while developing a project or experiments done just for fun and out of curiosity.
-  Index below. You can view some results at https://hamoid.com and at http://hamoid.tumblr.com/archive
+  Index below. You can view some results at https://hamoid.com and https://genart.social/@hamoid/media
 
 Most programs here are written using [Processing](http://www.processing.org/).
 Some with [SuperCollider](https://supercollider.github.io/).
 They are great for creating static / animated / interactive graphics and sound synthesis.
 
-My current tools include [OPENRNDR](https://openrndr.discourse.group/t/doodles-wall-c/51/3) and [GLSL](https://hamoid.com/post/in-the-mood-for-shaders/).
+Since 2020 I've focused on [OPENRNDR](https://openrndr.discourse.group/t/doodles-wall-c/51/3) and [GLSL](https://hamoid.com/post/in-the-mood-for-shaders/).
 
 ### Roadmap
 
@@ -42,7 +43,7 @@ My current tools include [OPENRNDR](https://openrndr.discourse.group/t/doodles-w
 - [ ] Add tags to each sketch
 - [ ] Upload my sketches, one per day. I should be done in 2020.
 - [ ] Write a readme.md for each
- 
+
 ''')
 f.write(('| . ' * columns) + '|\n')
 f.write(('| --- ' * columns) + '|\n')
@@ -56,14 +57,14 @@ col = 0
 
 for line in result:
   if line:
-   
+
     sketchName = os.path.splitext(os.path.basename(line))[0]
     ideaFolder = os.path.dirname(line)
-    
+
     if line.endswith('.pde'):
       if sketchName not in ideaFolder.split('/'):
         continue
-    
+
     description = ""
     # Build description
     if os.path.exists(ideaFolder + '/readme.md'):
@@ -74,7 +75,7 @@ for line in result:
         if not (line.startswith('#') or line.startswith('!')):
           description = description + line.strip() + ' '
       description = cleanhtml(description)
-      description = cgi.escape(description, True)
+      description = html.escape(description, True)
 
     thumb = ""
     # If there is no .thumb.jpg, create it from thumb.png or thumb.jpg
@@ -100,17 +101,17 @@ for line in result:
       with open(ideaFolder + '/.tags', 'r') as tagsf:
         tags = tagsf.read().replace('\n', '').replace(',', ', ')
       tags = cleanhtml(tags)
-      tags = "<br><sub>" + cgi.escape(tags, True) + "</sub>"
+      tags = "<br><sub>" + html.escape(tags, True) + "</sub>"
 
-    sketchName = re.sub("([a-z])([A-Z])","\g<1> \g<2>", sketchName.replace('_', ' '))
+    sketchName = re.sub("([a-z])([A-Z])",r"\g<1> \g<2>", sketchName.replace('_', ' '))
 
     f.write('| [%s%s](%s/%s/) %s ' % (sketchName, thumb, absolutePath, ideaFolder, tags))
-    
+
     if col % columns == (columns - 1):
       f.write(' |\n')
-      
+
     col = col + 1
-    
+
 f.close()
 
 os.system('git add readme.md')
