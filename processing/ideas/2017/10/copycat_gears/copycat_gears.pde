@@ -34,9 +34,9 @@ void draw() {
     g.draw();
   }
   a += TAU / 150;
-  if(frameCount % 150 == 0) {
-    exit();
-    println(gears.get(0).getRotation());
-  }
-  save("/tmp/a/" + nf(frameCount,4) + ".gif");
+  //if(frameCount % 150 == 0) {
+  //  exit();
+  //  println(gears.get(0).getRotation());
+  //}
+  //save("/tmp/a/" + nf(frameCount,4) + ".gif");
 }
